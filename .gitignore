@@ -1,0 +1,27 @@
+cat > .gitignore << 'EOF'
+# NixOS build artifacts
+result
+/result
+*.result
+
+# Common caches and temporary files
+.cache/
+.direnv/
+.envrc
+*.swp
+*~
+.DS_Store
+
+# Secrets (add more patterns as needed)
+secrets/
+*.key
+*.pem
+*.secret
+hardware-configuration.nix   # often auto-generated – commit once then ignore
+
+# Large or unnecessary folders in ~/.config
+**/cache/**
+**/Cache/**
+**/node_modules/
+**/target/
+EOF
