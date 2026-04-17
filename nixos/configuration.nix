@@ -2,16 +2,15 @@
 
 {
   time.timeZone = "Europe/London";
-  #########################
-  # Base / Hardware / Themes
-  #########################
+
+
+
   imports =
   [
     ./hardware-configuration.nix
-    ./themes.nix
-    ./pkgs.nix           # All non-Hyprland packages and GNOME/X11 apps
-    #Below-is-for-operating-systems
-    ./os/hyprland.nix
+   ./themes.nix
+   ./pkgs.nix   
+   ./os/hyprland.nix
     #./os/awesome.nix
     # ./os/kdeplasma.nix 
   ];
@@ -19,49 +18,70 @@
   "/share/applications"
   "/share/xdg-desktop-portal"
 ];
-   #########################
-  # Bootloader
-  #########################
   boot.loader = {
     efi.canTouchEfiVariables = true;
 
     grub = {
       enable = true;
       efiSupport = true;
-      device = "nodev";          # Required for UEFI
-      useOSProber = true;        # Detect other OSes for multi-boot
+      device = "nodev";         
+      useOSProber = true;       
     };
   };
 
-  #########################
-  # Swap & zram
-  #########################
   zramSwap = {
     enable = true;
-    memoryPercent = 50;          # ~16 GB compressed
-    algorithm = "zstd";          # Better compression ratio
-    priority = 100;              # High priority
+    memoryPercent = 50;         
+    algorithm =  "zstd";         
+    priority = 100;             
   };
 
   swapDevices = [
     {
       device = "/var/lib/swapfile";
-      size = 16384;               # 16 GiB
-      # randomEncryption.enable = true;  # Optional
-      # priority = -1;                  # Lower than zram if using both
+      size = 16384;             
     }
   ];
 
-  #########################
-  # Networking & Firewall
-  #########################
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
   services.tailscale.enable = true;
-  services.avahi.enable = true;
-  services.avahi.nssmdns4 = true;
-  networking.firewall.allowedTCPPorts = [ 5960 5961 5962 5963 5964 5965 5966 4444 ];
-  networking.firewall.allowedUDPPorts = [  5353 4444 ];
+   networking.firewall = {
+    allowedTCPPorts = [
+      5959
+      5960
+      5961
+    ];
+    allowedTCPPortRanges = [
+      {
+        from = 6960;
+        to = 8000;
+      }
+      {
+        from = 7960;
+        to = 9000;
+      }
+    ];
+    allowedUDPPortRanges = [
+      {
+        from = 6960;
+        to = 8000;
+      }
+      {
+        from = 7960;
+        to = 9000;
+      }
+    ];
+  };
+  services.avahi = {
+      enable = true;
+      openFirewall = true;
+      nssmdns6 = true;
+      publish = {
+        enable = true;
+        userServices = true;
+      };
+    };
   networking.firewall.enable = true;
   services.flatpak.enable = true;  
  services.syncthing = {
@@ -70,9 +90,6 @@
 	dataDir = "/home/zip/Documents/syncthing";
        };  
 
-  #########################
-  # Kernel / Hardware tweaks
-  #########################
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
@@ -90,9 +107,6 @@ services.udisks2.enable = true;
   networking.interfaces.tailscale0 = {
   mtu = 1280;
   };
-  #########################
-  # File Systems / Mounts
-  #########################
   boot.supportedFilesystems = [ "ntfs" "ntfs3" ];
 
   fileSystems = {
@@ -129,9 +143,6 @@ services.udisks2.enable = true;
       ];
     };
   };
-  #########################
-  # Users
-  #########################
   users.users.zip = {
     isNormalUser = true;
     description = "zipasaurus";
@@ -139,15 +150,9 @@ services.udisks2.enable = true;
     packages = with pkgs; [];
   };
 
-  #########################
-  # Locale & Keymaps
-  #########################
   i18n.defaultLocale = "en_GB.UTF-8";
   console.keyMap = "uk";
   nixpkgs.config.allowUnfree = true;
 
-  #########################
-  # System version
-  #########################
-  system.stateVersion = "25.05"; 
+  system.stateVersion = "25.11"; 
 }
